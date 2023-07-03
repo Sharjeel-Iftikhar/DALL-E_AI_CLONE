@@ -23,11 +23,11 @@ const FormField = ({labelName,name,type,placeholder,value,handleChange,isSurpris
     <input
     type={type}
     name={name}
-    required
     id={name}
     placeholder={placeholder}
     value={value}
-    handleChange={handleChange}
+    onChange={handleChange}
+    required
     className = 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-[#6449ff]  focus:border-[#6449ff] p-3 w-full ouline-none block'
     />
     </div>

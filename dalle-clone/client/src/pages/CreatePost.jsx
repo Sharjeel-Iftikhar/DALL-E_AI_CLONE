@@ -5,6 +5,9 @@ import { preview } from '../assets';
 import {getRandomPrompt} from '../utils'
 
 
+const apikey = import.meta.env.VITE_KEY;
+
+
 function CreatePost() {
 
   const [form, setForm] = useState({
@@ -16,15 +19,92 @@ function CreatePost() {
   const [generatingImg, setGeneratingImg] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = () => {};
+  const handleSubmit = async(e) => {
+    e.preventDefault();
+    if(form.name && form.photo)
+    {
+      setIsLoading(true);
+      try{
+        const response = await fetch('http://localhost:3001/api/v1/posts', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(form)
+        });
+        const data = await response.json();
+        console.log(data);
+        if(data){
+          navigate('/');
+        }
+      }
+      catch(err){
+        console.log(err);
+        alert(err.message);
+      }
+      finally{
+        setIsLoading(false);
+      }
+    }
+    else{
+      alert('Please fill all the fields');
+    }
+  };
+
   const handleChange = (e) => {
     setForm({...form, [e.target.name]: e.target.value})
   };
+
   const handleSurpriseMe = () => {
     const randomPrompt = getRandomPrompt(form.prompt);
     setForm({...form, prompt: randomPrompt})
   };
-  const generateImage = () => {};
+
+  const generateImage = async () => {
+    if(form.prompt)
+    {
+      try{
+        const formm = new FormData()
+        formm.append('prompt', `${form.prompt}`)
+        setGeneratingImg(true);
+        
+        const response = await fetch('https://clipdrop-api.co/text-to-image/v1', {
+          method: 'POST',
+          headers: {
+            'x-api-key': `${apikey}`
+          },
+          body: formm
+        }).then(response => response.arrayBuffer())
+        .then(buffer => {
+          // buffer here is a binary representation of the returned image
+          // you can convert it to base64 and display it in the browser directly
+          // or you can save it to the disk using nodejs
+           const arrayBufferToBase64 = (buffer) => {
+            let binary = '';
+            const bytes = [].slice.call(new Uint8Array(buffer));
+            bytes.forEach((b) => binary += String.fromCharCode(b));
+            return window.btoa(binary);
+          };
+          const base64Flag = 'data:image/png;base64,';
+          const imageStr = arrayBufferToBase64(buffer);
+          const base64Image = base64Flag + imageStr;
+
+          setForm({...form, photo: base64Image});
+        })
+      } 
+      catch(err){
+        console.log(err);
+        alert(err.message); 
+      }
+      finally{
+        setGeneratingImg(false);
+      }
+    }
+    else{
+      alert('Please enter the prompt first');
+    }
+    
+  };
 
 
   return (
@@ -48,15 +128,15 @@ function CreatePost() {
           type='text'
           placeholder='Sharjeel'
           value={form.name}
-          onChange={handleChange}
+          handleChange={handleChange}
           />
           <FormField
           labelName='Prompt'
           name='prompt'
           type='text'
-          placeholder='a sea otter with a pearl earring" by Johannes Vermeer'
+          placeholder='"a sea otter with a pearl earring" by Johannes Vermeer'
           value={form.prompt}
-          onChange={handleChange}
+          handleChange={handleChange}
           isSurpriseMe
           handleSurpriseMe={handleSurpriseMe}
           />
