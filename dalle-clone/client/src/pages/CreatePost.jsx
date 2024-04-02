@@ -25,7 +25,7 @@ function CreatePost() {
     {
       setIsLoading(true);
       try{
-        const response = await fetch('http://localhost:3001/api/v1/posts', {
+        const response = await fetch('https://dall-e-ai-clone-server.vercel.app/api/v1/posts', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
