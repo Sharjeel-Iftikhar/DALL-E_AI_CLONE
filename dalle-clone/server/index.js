@@ -17,7 +17,9 @@ const PORT = 3001;
 
 app.use('/api/v1/posts', postsRoutes);
 
-
+app.get('/', (req, res) => {
+    res.send('Hello to dalle-clone API');
+});
 
 
 const starServer = async () => {

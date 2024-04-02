@@ -5,4 +5,4 @@
         "use":"@vercel/node"
     }
 ],
- "routes": [{ "src": "/api/v1/posts", "dest": "index.js" }] }
+ "routes": [{ "src": "/(.*)", "dest": "index.js" }] }
